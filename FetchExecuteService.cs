@@ -28,6 +28,8 @@ namespace emulator_backend_8080
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Starting fetch execute service for 8080 backend");
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 var unassignedComputer = await _dbContext.Computer.FirstOrDefaultAsync(c => c.Status == ComputerStatus.NotAssigned, cancellationToken);
@@ -40,6 +42,8 @@ namespace emulator_backend_8080
 
                     await RunComputerAsync(unassignedComputer);
                 }
+                
+                await Task.Delay(5000);
             }
         }
 
