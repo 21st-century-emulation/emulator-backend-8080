@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading;
@@ -40,14 +41,14 @@ namespace emulator_backend_8080
                     unassignedComputer.Status = ComputerStatus.Assigned;
                     await _dbContext.SaveChangesAsync();
 
-                    await RunComputerAsync(unassignedComputer);
+                    await RunComputerAsync(unassignedComputer, cancellationToken);
                 }
                 
                 await Task.Delay(5000);
             }
         }
 
-        private async Task RunComputerAsync(Computer computer)
+        private async Task RunComputerAsync(Computer computer, CancellationToken cancellationToken)
         {
             if (computer == null) throw new ArgumentNullException(nameof(computer));
 
@@ -64,7 +65,7 @@ namespace emulator_backend_8080
             {
                 if (cpuIsHalted) continue; // TODO - Don't spin wait on HLT waiting for interrupt
 
-                cpu.Opcode = (await _dbContext.AddressSpace.SingleAsync(m => m.ComputerId == computer.Id && m.Address == cpu.State.ProgramCounter)).Value;
+                cpu.Opcode = (await _dbContext.AddressSpace.SingleAsync(m => m.ComputerId == computer.Id && m.Address == cpu.State.ProgramCounter, cancellationToken)).Value;
 
                 var bytes = CpuStaticData.NumberOfBytesPerOpcode[cpu.Opcode];
                 var opcode = CpuStaticData.OpcodeName[cpu.Opcode];
@@ -82,12 +83,18 @@ namespace emulator_backend_8080
 
                         for (var ii = 1; ii < bytes; ii++)
                         {
-                            var operand = (await _dbContext.AddressSpace.SingleAsync(m => m.ComputerId == computer.Id && m.Address == cpu.State.ProgramCounter + ii)).Value;
+                            var operand = (await _dbContext.AddressSpace.SingleAsync(m => m.ComputerId == computer.Id && m.Address == cpu.State.ProgramCounter + ii, cancellationToken)).Value;
                             url += $"operand{ii}={operand}&";
                         }
-                        var response = await client.PostAsJsonAsync(url, cpu);
+                        var response = await client.PostAsync(
+                            url, 
+                            new StringContent(JsonSerializer.Serialize(cpu))
+                            {
+                                Headers = { ContentType = new MediaTypeHeaderValue("application/json") }
+                            });
+
                         response.EnsureSuccessStatusCode();
-                        cpu = await response.Content.ReadFromJsonAsync<Cpu>();
+                        cpu = await response.Content.ReadFromJsonAsync<Cpu>(cancellationToken: cancellationToken);
                         break;
                 }
 
@@ -97,10 +104,10 @@ namespace emulator_backend_8080
                     countdownToStatusUpdate = 1000;
                     using (var stream = new MemoryStream())
                     {
-                        await JsonSerializer.SerializeAsync(stream, cpu);
+                        await JsonSerializer.SerializeAsync(stream, cpu, cancellationToken: cancellationToken);
                         stream.Position = 0;
-                        computer.State = await JsonDocument.ParseAsync(stream);
-                        await _dbContext.SaveChangesAsync();
+                        computer.State = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
+                        await _dbContext.SaveChangesAsync(cancellationToken: cancellationToken);
                     }
                 }    
             }
