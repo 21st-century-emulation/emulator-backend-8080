@@ -64,13 +64,13 @@ namespace emulator_backend_8080
             {
                 if (cpuIsHalted) continue; // TODO - Don't spin wait on HLT waiting for interrupt
 
-                cpu.Opcode = (await _dbContext.AddressSpace.SingleAsync(m => m.Address == cpu.State.ProgramCounter)).Value;
+                cpu.Opcode = (await _dbContext.AddressSpace.SingleAsync(m => m.ComputerId == computer.Id && m.Address == cpu.State.ProgramCounter)).Value;
 
+                _logger.LogInformation("{Id}: {Opcode} {CpuState}", computer.Id, opcode, cpu.State.ToString());
+                
                 var bytes = CpuStaticData.NumberOfBytesPerOpcode[cpu.Opcode];
                 var opcode = CpuStaticData.OpcodeName[cpu.Opcode];
                 cpu.State.ProgramCounter = (ushort)(cpu.State.ProgramCounter + bytes);
-
-                _logger.LogInformation("{Id}: {Opcode} {@Cpu}", computer.Id, opcode, cpu);
 
                 switch (opcode)
                 {
@@ -83,7 +83,7 @@ namespace emulator_backend_8080
 
                         for (var ii = 1; ii < bytes; ii++)
                         {
-                            var operand = (await _dbContext.AddressSpace.SingleAsync(m => m.Address == cpu.State.ProgramCounter + ii)).Value;
+                            var operand = (await _dbContext.AddressSpace.SingleAsync(m => m.ComputerId == computer.Id && m.Address == cpu.State.ProgramCounter + ii)).Value;
                             url += $"operand{ii}={operand}&";
                         }
                         var response = await client.PostAsJsonAsync(url, cpu);

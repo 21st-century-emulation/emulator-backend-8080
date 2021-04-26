@@ -42,7 +42,7 @@ namespace emulator_backend_8080
                             .UseSnakeCaseNamingConvention()
                     );
 
-                    services.AddTransient<FetchExecuteService>();
+                    services.AddHostedService<FetchExecuteService>();
 
                     services.AddHttpClient();
                 });
