@@ -1,8 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
-
+ARG GITHUB_USER
+ARG GITHUB_PASSWORD
 WORKDIR /app
 
-COPY FetchExecuteService.csproj Nuget.config ./
+COPY emulator-backend-8080.csproj Nuget.config ./
 RUN dotnet restore --configfile Nuget.config
 
 COPY . .
@@ -13,4 +14,4 @@ WORKDIR /app
 COPY --from=build /app/output ./
 ENV ASPNETCORE_URLS=http://0.0.0.0:8080
 EXPOSE 8080
-ENTRYPOINT ["dotnet", "FetchExecuteService.dll"]
+ENTRYPOINT ["dotnet", "emulator-backend-8080.dll"]
