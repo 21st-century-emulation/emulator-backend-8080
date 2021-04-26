@@ -1,6 +1,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 ARG GITHUB_USER
 ARG GITHUB_PASSWORD
+ENV GITHUB_USER=${GITHUB_USER}
+ENV GITHUB_PASSWORD=${GITHUB_PASSWORD}
 WORKDIR /app
 
 COPY emulator-backend-8080.csproj Nuget.config ./
