@@ -30,7 +30,7 @@ jobs:
           context: .
           file: Dockerfile
           build-args: |
-            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            GITHUB_TOKEN=${{ secrets.PACKAGE_DOWNLOADER }}
             GITHUB_USER=${{ github.repository_owner }}
           push: true
           tags: ghcr.io/${{ github.repository }}:latest
