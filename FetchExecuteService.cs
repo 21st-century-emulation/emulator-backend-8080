@@ -78,7 +78,7 @@ namespace emulator_backend_8080
                         break;
                     default:
                         // All other opcodes correspond directly to microservices
-                        var url = CpuStaticData.OpcodeUrl[opcode];
+                        var url = CpuStaticData.OpcodeUrl[opcode] + "?";
 
                         for (var ii = 1; ii < bytes; ii++)
                         {
