@@ -50,6 +50,6 @@
 	//    * If only using Remote - Containers with a local container, uncomment this line instead:
 	//      "mounts": [ "source=${env:HOME}${env:USERPROFILE}/.aspnet/https,target=/home/vscode/.aspnet/https,type=bind" ],
 
-	"postCreateCommand": "dotnet tool restore && dotnet restore --configFile Nuget.config",
+	"postCreateCommand": "dotnet tool restore",
 	"remoteUser": "vscode"
 }
