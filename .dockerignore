@@ -1,0 +1,7 @@
+bin/
+obj/
+Dockerfile
+.config/
+.devcontainer/
+.vscode/
+Properties/
