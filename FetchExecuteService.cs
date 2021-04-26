@@ -66,10 +66,9 @@ namespace emulator_backend_8080
 
                 cpu.Opcode = (await _dbContext.AddressSpace.SingleAsync(m => m.ComputerId == computer.Id && m.Address == cpu.State.ProgramCounter)).Value;
 
-                _logger.LogInformation("{Id}: {Opcode} {CpuState}", computer.Id, opcode, cpu.State.ToString());
-                
                 var bytes = CpuStaticData.NumberOfBytesPerOpcode[cpu.Opcode];
                 var opcode = CpuStaticData.OpcodeName[cpu.Opcode];
+                _logger.LogInformation("{Id}: {Opcode} {CpuState}", computer.Id, opcode, cpu.State.ToString());
                 cpu.State.ProgramCounter = (ushort)(cpu.State.ProgramCounter + bytes);
 
                 switch (opcode)
