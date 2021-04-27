@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog.Sinks.Grafana.Loki;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using Serilog.Events;
 
 namespace emulator_backend_8080
 {
@@ -22,7 +23,9 @@ namespace emulator_backend_8080
             return Host.CreateDefaultBuilder()
                 .UseSerilog((hostContext, loggerConfiguration) =>
                 {
-                    loggerConfiguration.WriteTo.Console();
+                    loggerConfiguration
+                        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                        .WriteTo.Console();
                     var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
                     if (lokiUrl != null)
                     {

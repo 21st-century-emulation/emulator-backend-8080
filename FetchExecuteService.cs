@@ -19,12 +19,18 @@ namespace emulator_backend_8080
         public ILogger<FetchExecuteService> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly CpuDbContext _dbContext;
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
 
         public FetchExecuteService(ILogger<FetchExecuteService> logger, IHttpClientFactory httpClientFactory, CpuDbContext dbContext)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _jsonSerializerOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                IncludeFields = true,
+            };
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -53,7 +59,10 @@ namespace emulator_backend_8080
             if (computer == null) throw new ArgumentNullException(nameof(computer));
 
             // Create new CPU object
-            var cpu = new Cpu();
+            var cpu = new Cpu
+            {
+                Id = computer.Id.ToString()
+            };
             var cpuIsHalted = false;
             // TODO - Create microservice which can set initial values on CPU object
 
@@ -79,22 +88,29 @@ namespace emulator_backend_8080
                         break;
                     default:
                         // All other opcodes correspond directly to microservices
-                        var url = CpuStaticData.OpcodeUrl[opcode] + "?";
+                        var url = CpuStaticData.OpcodeUrl[opcode];
 
-                        for (var ii = 1; ii < bytes; ii++)
+                        if (bytes > 0)
                         {
-                            var operand = (await _dbContext.AddressSpace.SingleAsync(m => m.ComputerId == computer.Id && m.Address == cpu.State.ProgramCounter + ii, cancellationToken)).Value;
-                            url += $"operand{ii}={operand}&";
+                            url += "?";
+                            for (var ii = 1; ii < bytes; ii++)
+                            {
+                                var operand = (await _dbContext.AddressSpace.SingleAsync(m => m.ComputerId == computer.Id && m.Address == cpu.State.ProgramCounter + ii, cancellationToken)).Value;
+                                url += $"operand{ii}={operand}";
+
+                                if (ii != bytes - 1) url += "&";
+                            }
                         }
+                        _logger.LogInformation(JsonSerializer.Serialize(cpu, _jsonSerializerOptions));
                         var response = await client.PostAsync(
                             url, 
-                            new StringContent(JsonSerializer.Serialize(cpu))
+                            new StringContent(JsonSerializer.Serialize(cpu, _jsonSerializerOptions))
                             {
                                 Headers = { ContentType = new MediaTypeHeaderValue("application/json") }
                             });
 
                         response.EnsureSuccessStatusCode();
-                        cpu = await response.Content.ReadFromJsonAsync<Cpu>(cancellationToken: cancellationToken);
+                        cpu = await response.Content.ReadFromJsonAsync<Cpu>(_jsonSerializerOptions, cancellationToken: cancellationToken);
                         break;
                 }
 
