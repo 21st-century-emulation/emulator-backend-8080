@@ -18,7 +18,7 @@
     <PackageReference Include="Serilog.Extensions.Hosting" Version="4.1.2" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.Grafana.Loki" Version="5.1.2" />
-    <PackageReference Include="21stCenturyEmulation.EmulationDatabaseLibrary" Version="0.0.5" />
+    <PackageReference Include="21stCenturyEmulation.EmulationDatabaseLibrary" Version="0.0.8" />
   </ItemGroup>
 
 </Project>
