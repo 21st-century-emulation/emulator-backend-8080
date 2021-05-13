@@ -39,8 +39,6 @@ namespace emulator_backend_8080.Controllers
             _logger.LogInformation("Requesting state of compuer with id {0}", id);
             var cpu = await _fetchExecuteServiceQueue.GetStateAsync();
             if (!cpu.HasValue) return StatusCode(500, "Couldn't acquire lock to get state");
-
-            _logger.LogWarning("{0}", cpu?.Id);
             return Ok(cpu);
         }
     }

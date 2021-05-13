@@ -124,7 +124,7 @@ namespace emulator_backend_8080.Services
                 countdownToStatusUpdate -= cyclesTaken;
                 if (countdownToStatusUpdate < 0)
                 {
-                    _logger.LogWarning("Saving cpu state to database for analysis after 1000 cycles");
+                    _logger.LogInformation("Saving cpu state to database for analysis after 1000 cycles");
                     countdownToStatusUpdate = 1000;
                     await _fetchExecuteServiceQueue.SetStateAsync(cpu, cancellationToken);
                 }
