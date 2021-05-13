@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace emulator_backend_8080.Models
 {
@@ -109,7 +109,7 @@ namespace emulator_backend_8080.Models
 
         private static string OperandsAsWord(byte operand1, byte operand2) => $"{(((ushort)operand2 << 8) | (ushort)operand1):X4}";
 
-        private static string DecodeMovDestination(byte opcode) => (opcode & 0xF0, opcode & 0x0F) switch 
+        private static string DecodeMovDestination(byte opcode) => (opcode & 0xF0, opcode & 0x0F) switch
         {
             (0x40, var lsn) when lsn < 8 => "B",
             (0x40, var lsn) when lsn >= 8 => "C",
@@ -122,7 +122,7 @@ namespace emulator_backend_8080.Models
             _ => throw new ArgumentOutOfRangeException(nameof(opcode))
         };
 
-        private static string DecodeMovSource(byte opcode) => (opcode & 0x0F) switch 
+        private static string DecodeMovSource(byte opcode) => (opcode & 0x0F) switch
         {
             0x0 => "B",
             0x1 => "C",
@@ -165,7 +165,7 @@ namespace emulator_backend_8080.Models
             Opcode.CMP => $"CMP  {RegisterFromArithmeticOp(opcodeByte)}",
             Opcode.CPI => $"CPI  {operand1:X2}",
             Opcode.DAA => "DAA",
-            Opcode.DAD => $"DAD  {opcodeByte switch { 0x09 => "BC", 0x19 => "DE", 0x29 => "HL", 0x39 => "SP", _ => throw new ArgumentOutOfRangeException(nameof(opcodeByte), opcodeByte, "opcode byte is invalid" ) }}",
+            Opcode.DAD => $"DAD  {opcodeByte switch { 0x09 => "BC", 0x19 => "DE", 0x29 => "HL", 0x39 => "SP", _ => throw new ArgumentOutOfRangeException(nameof(opcodeByte), opcodeByte, "opcode byte is invalid") }}",
             Opcode.DCR => $"DCR  {opcodeByte switch { 0x05 => "B", 0x0D => "C", 0x15 => "D", 0x1D => "E", 0x25 => "H", 0x2D => "L", 0x35 => "(HL)", 0x3D => "A", _ => throw new ArgumentOutOfRangeException(nameof(opcodeByte), opcodeByte, "opcode byte is invalid") }}",
             Opcode.DCX => $"DCX  {opcodeByte switch { 0x0B => "BC", 0x1B => "DE", 0x2B => "HL", 0x3B => "SP", _ => throw new ArgumentOutOfRangeException(nameof(opcodeByte), opcodeByte, "opcode byte is invalid") }}",
             Opcode.DI => "DI",
@@ -185,8 +185,8 @@ namespace emulator_backend_8080.Models
             Opcode.JM => $"JM   {OperandsAsWord(operand1, operand2)}",
             Opcode.LDA => $"LDA  ({OperandsAsWord(operand1, operand2)})",
             Opcode.LDAX => $"LDAX {opcodeByte switch { 0x0A => "BC", 0x1A => "DE", _ => throw new ArgumentOutOfRangeException(nameof(opcodeByte), opcodeByte, "opcode byte is invalid") }}",
-            Opcode.LHLD => $"LHLD ({OperandsAsWord(operand1, operand2)}",
-            Opcode.LXI => $"LXI  {opcodeByte switch { 0x01 => "BC", 0x11 => "DE", 0x21 => "HL", 0x31 => "SP", _ => throw new ArgumentOutOfRangeException(nameof(opcodeByte), opcodeByte, "opcode byte is invalid")}}, {OperandsAsWord(operand1, operand2)}",
+            Opcode.LHLD => $"LHLD ({OperandsAsWord(operand1, operand2)})",
+            Opcode.LXI => $"LXI  {opcodeByte switch { 0x01 => "BC", 0x11 => "DE", 0x21 => "HL", 0x31 => "SP", _ => throw new ArgumentOutOfRangeException(nameof(opcodeByte), opcodeByte, "opcode byte is invalid") }}, {OperandsAsWord(operand1, operand2)}",
             Opcode.MOV => $"MOV  {DecodeMovDestination(opcodeByte)},{DecodeMovSource(opcodeByte)}",
             Opcode.MVI => $"MVI  {opcodeByte switch { 0x06 => "B", 0x0E => "C", 0x16 => "D", 0x1E => "E", 0x26 => "H", 0x2E => "L", 0x36 => "(HL)", 0x3E => "A", _ => throw new ArgumentOutOfRangeException(nameof(opcodeByte), opcodeByte, "opcode byte is invalid") }}, {operand1:X2}",
             Opcode.NOOP => "NOOP",
@@ -194,8 +194,8 @@ namespace emulator_backend_8080.Models
             Opcode.ORI => $"ORI  {operand1:X2}",
             Opcode.OUT => $"OUT  {operand1:X2}",
             Opcode.PCHL => "PCHL",
-            Opcode.POP =>  $"POP  {opcodeByte switch { 0xC1 => "BC", 0xD1 => "DE", 0xE1 => "HL", 0xF1 => "PSW", _ => throw new ArgumentOutOfRangeException(nameof(opcodeByte), opcodeByte, "opcode byte is invalid") }}",
-            Opcode.PUSH =>  $"PUSH {opcodeByte switch { 0xC5 => "BC", 0xD5 => "DE", 0xE5 => "HL", 0xF5 => "PSW", _ => throw new ArgumentOutOfRangeException(nameof(opcodeByte), opcodeByte, "opcode byte is invalid") }}",
+            Opcode.POP => $"POP  {opcodeByte switch { 0xC1 => "BC", 0xD1 => "DE", 0xE1 => "HL", 0xF1 => "PSW", _ => throw new ArgumentOutOfRangeException(nameof(opcodeByte), opcodeByte, "opcode byte is invalid") }}",
+            Opcode.PUSH => $"PUSH {opcodeByte switch { 0xC5 => "BC", 0xD5 => "DE", 0xE5 => "HL", 0xF5 => "PSW", _ => throw new ArgumentOutOfRangeException(nameof(opcodeByte), opcodeByte, "opcode byte is invalid") }}",
             Opcode.RAL => "RAL",
             Opcode.RAR => "RAR",
             Opcode.RET => "RET",
