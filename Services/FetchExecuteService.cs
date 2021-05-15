@@ -171,7 +171,15 @@ namespace emulator_backend_8080.Services
                 {
                     _logger.LogInformation("Found unassigned computer with id {0}", id);
 
-                    await RunComputerAsync(id, stoppingToken);
+                    try
+                    {
+                        await RunComputerAsync(id, stoppingToken);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogCritical(e, "Computer has failed due to unhandled exception. Probably undefined behaviour");
+                        throw;
+                    }
                 }
 
                 await Task.Delay(1000);
