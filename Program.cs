@@ -14,7 +14,7 @@ namespace emulator_backend_8080
             var logConfig = new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("System.Net.Http.HttpClient", LogEventLevel.Warning)
-                .MinimumLevel.Warning()
+                .MinimumLevel.Information()
                 .WriteTo.Console();
 
             Log.Logger = logConfig.CreateLogger();
