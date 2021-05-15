@@ -36,7 +36,7 @@ namespace emulator_backend_8080.Controllers
         [ProducesResponseType(typeof(Cpu), StatusCodes.Status200OK)]
         public async Task<IActionResult> Status(string id)
         {
-            _logger.LogInformation("Requesting state of compuer with id {0}", id);
+            _logger.LogDebug("Requesting state of computer with id {0}", id);
             var cpu = await _fetchExecuteServiceQueue.GetStateAsync();
             if (!cpu.HasValue) return StatusCode(500, "Couldn't acquire lock to get state");
             return Ok(cpu);
