@@ -51,7 +51,7 @@ namespace emulator_backend_8080.Services
             cpu = await CallMicroserviceAsync(client, _initialiseCpuServiceUrl, cpu, cancellationToken);
 
             // Start fetch execute loop
-            var countdownToStatusUpdate = 1000;
+            var countdownToStatusUpdate = 0;
             int cyclesTaken = 0;
 
             while (true)
